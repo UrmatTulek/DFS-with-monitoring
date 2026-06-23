@@ -31,7 +31,9 @@ python3 client/client.py put <filename>
 
 python3 client/client.py delete <filename>
 
-python3 client/client.py get <filename>
+python3 client/client.py get <filename> 
+
+python3 client/client.py get <filename> --peak #For looking at files contents if it's a text file
 
 python3 client/client.py list
 `````

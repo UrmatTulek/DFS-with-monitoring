@@ -56,7 +56,7 @@ def put(filename):
         except urllib.error.URLError as e:
             print(f'Could not reach {node} - {e}')
 
-def get(filename):
+def get(filename, peek=False):
     try:
         with urllib.request.urlopen(f'{NAMESERVER}/lookup/{filename}') as res:
             response = json.loads(res.read())
@@ -78,10 +78,18 @@ def get(filename):
                 f'http://{get_node_address(node)}/fetch/{filename}'
             ) as res:
                 data = res.read()
-            with open(filename, 'wb') as f:
-                f.write(data)
-
-            print(f'{filename} was retrieved from {node}')
+            
+            if peek:
+                try:
+                    print(f'\n--{filename} from {node}--')
+                    print(data.decode('utf-8'))
+                    print(f'\n--end of the file--')
+                except UnicodeDecodeError:
+                    print(f'Binary file - {len(data)} bytes')
+            else:
+                with open(filename, 'wb') as f:
+                    f.write(data)
+                print(f'{filename} was retrieved from {node}')
             return
         except urllib.error.URLError as e:
             print(f'Could not reach {node} - {e}')
@@ -163,6 +171,8 @@ if __name__ == '__main__':
         put(sys.argv[2])
     elif command == 'get' and len(sys.argv) == 3:
         get(sys.argv[2])
+    elif command == 'get' and len(sys.argv) == 4 and sys.argv[3] == '--peak':
+        get(sys.argv[2], True)
     elif command == 'list':
         list_files()
     elif command == 'delete' and len(sys.argv) == 3:
