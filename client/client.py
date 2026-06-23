@@ -16,12 +16,14 @@ NODE_HOST_MAP = {
 
 NAMESERVER = f'http://{NAMESERVER_HOST}:{NAMESERVER_PORT}'
 
-def put(filename):
-    if not os.path.exists(filename):
-        print(f'ERROR: file {filename} does not exist locally')
+def put(filepath):
+    if not os.path.exists(filepath):
+        print(f'ERROR: file {filepath} does not exist locally')
         return
     
-    with open(filename, 'rb') as f:
+    filename = os.path.basename(filepath)
+
+    with open(filepath, 'rb') as f:
         data = f.read()
     
     print(f'Registering {filename} in the name server')
@@ -57,6 +59,7 @@ def put(filename):
             print(f'Could not reach {node} - {e}')
 
 def get(filename, peek=False):
+    filename = os.path.basename(filename)
     try:
         with urllib.request.urlopen(f'{NAMESERVER}/lookup/{filename}') as res:
             response = json.loads(res.read())
@@ -113,6 +116,7 @@ def list_files():
         print(f'Could not reach server - {e}')
 
 def delete(filename):
+    filename = os.path.basename(filename)
     try:
         with urllib.request.urlopen(f'{NAMESERVER}/lookup/{filename}') as res:
             response = json.loads(res.read())
@@ -171,7 +175,7 @@ if __name__ == '__main__':
         put(sys.argv[2])
     elif command == 'get' and len(sys.argv) == 3:
         get(sys.argv[2])
-    elif command == 'get' and len(sys.argv) == 4 and sys.argv[3] == '--peak':
+    elif command == 'get' and len(sys.argv) == 4 and sys.argv[3] == '--peek':
         get(sys.argv[2], True)
     elif command == 'list':
         list_files()

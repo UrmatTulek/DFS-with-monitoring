@@ -14,7 +14,7 @@ def load_metadata():
     global file_map
     if os.path.exists(METADATA_FILE):
         with open(METADATA_FILE, 'r') as f:
-            file_map = json.loads(f)
+            file_map = json.load(f)
         print(f'Loaded {len(file_map)} file(s) from metadata store')
     else:
         print('Starting fresh, no files detected in the metadata')
