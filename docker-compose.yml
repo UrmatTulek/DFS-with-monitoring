@@ -1,0 +1,63 @@
+services:
+  nameserver:
+    build: ./nameserver
+    container_name: nameserver
+    ports:
+      - "5000:5000"
+    networks:
+      - dfs-network
+    environment:
+      - NODES=node-a,node-b,node-c
+      - PORT=5000
+      - NAMESERVER_HOST=localhost
+  
+  node-a:
+    build: ./storagenode
+    image: dockerfs-storagenode
+    container_name: node-a
+    networks:
+      - dfs-network
+    environment:
+      - NODE_NAME=node-a
+      - NODE_PORT=5001
+    ports:
+      - "5001:5001"
+    volumes:
+      - node-a-data:/app/storage
+    
+  node-b:
+    build: ./storagenode
+    image: dockerfs-storagenode
+    container_name: node-b
+    networks:
+      - dfs-network
+    environment:
+      - NODE_NAME=node-b
+      - NODE_PORT=5001
+    ports:
+      - "5002:5001"
+    volumes:
+      - node-b-data:/app/storage
+  
+  node-c:
+    build: ./storagenode
+    image: dockerfs-storagenode
+    container_name: node-c
+    networks:
+      - dfs-network
+    environment:
+      - NODE_NAME=node-c
+      - NODE_PORT=5001
+    ports:
+      - "5003:5001"
+    volumes:
+      - node-c-data:/app/storage
+
+volumes:
+  node-a-data:
+  node-b-data:
+  node-c-data:
+
+networks:
+  dfs-network:
+    driver: bridge

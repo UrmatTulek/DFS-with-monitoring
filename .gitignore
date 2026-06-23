@@ -1,0 +1,9 @@
+.env
+__pycache__/
+*.pyc
+*.pyo
+report/*.txt
+test_files/
+.vscode/
+.DS_Store
+Thumbs.db
