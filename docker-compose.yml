@@ -10,6 +10,8 @@ services:
       - NODES=node-a,node-b,node-c
       - PORT=5000
       - NAMESERVER_HOST=localhost
+    volumes:
+      - nameserver-data:/app
   
   node-a:
     build: ./storagenode
@@ -54,6 +56,7 @@ services:
       - node-c-data:/app/storage
 
 volumes:
+  nameserver-data:
   node-a-data:
   node-b-data:
   node-c-data:

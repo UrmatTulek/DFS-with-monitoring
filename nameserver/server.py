@@ -6,8 +6,22 @@ import random
 PORT = int(os.environ.get('NAMESERVER_PORT', 5000))
 NODES = os.environ.get('NODES', 'node-a,node-b,node-c').split(',')
 REPLICATION_FACTOR = 2
+METADATA_FILE = '/app/metadata.json'
 
 file_map = {}
+
+def load_metadata():
+    global file_map
+    if os.path.exists(METADATA_FILE):
+        with open(METADATA_FILE, 'r') as f:
+            file_map = json.loads(f)
+        print(f'Loaded {len(file_map)} file(s) from metadata store')
+    else:
+        print('Starting fresh, no files detected in the metadata')
+
+def save_metadata():
+    with open(METADATA_FILE, 'w') as f:
+        json.dump(file_map, f)
 
 class NameServerHandler(BaseHTTPRequestHandler):
     def do_POST(self):
@@ -42,6 +56,7 @@ class NameServerHandler(BaseHTTPRequestHandler):
             return
         chosen_nodes = random.sample(NODES, REPLICATION_FACTOR)
         file_map[filename] = chosen_nodes
+        save_metadata()
         response = json.dumps({
             'nodes': chosen_nodes,
             'status': 'registered'
@@ -64,6 +79,7 @@ class NameServerHandler(BaseHTTPRequestHandler):
         filename = self.path[len('/delete/'):]
         if filename in file_map:
             del file_map[filename]
+            save_metadata()
             self._respond(200, 'DELETED')
         else:
             self._respond(404, 'FILE NOT FOUND')
@@ -81,6 +97,7 @@ class NameServerHandler(BaseHTTPRequestHandler):
         print(f'[nameserver] {args[0]}')
 
 if __name__ == '__main__':
+    load_metadata()
     print(f'Name server is running on {PORT} port')
     print(f'Storage nodes are {NODES}')
     server = HTTPServer(('0.0.0.0', PORT), NameServerHandler)
